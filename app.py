@@ -2,6 +2,8 @@ import os
 import tempfile
 from pathlib import Path
 from langchain_groq import ChatGroq
+from langchain_huggingface import HuggingFaceEmbeddings
+
 
 import streamlit as st
 from dotenv import load_dotenv
