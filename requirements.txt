@@ -22,6 +22,8 @@ torch>=2.5.0
 langchain-groq>=0.2.0
 groq>=0.4.0
 
+langchain-huggingface
+sentence-transformers
 # ==========================
 # Mistral API
 # ==========================
