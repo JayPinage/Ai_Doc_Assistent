@@ -1,6 +1,7 @@
 import os
 import tempfile
 from pathlib import Path
+from langchain_groq import ChatGroq
 
 import streamlit as st
 from dotenv import load_dotenv
@@ -87,8 +88,16 @@ Summaries:
 """
 )
 
-model1 = ChatMistralAI(model_name="mistral-large-latest", temperature=0.2)
-model2 = ChatMistralAI(model_name="mistral-small-latest", temperature=0.2)
+model1 = ChatGroq(
+    model="openai/gpt-oss-120b",
+    temperature=0,
+    api_key=st.secrets["GROQ_API_KEY"]
+)
+model2 = ChatGroq(
+    model="openai/gpt-oss-120b",
+    temperature=0,
+    api_key=st.secrets["GROQ_API_KEY"]
+)
 
 map_chain = summary_prompt | model2
 reduce_chain = reduce_prompt | model2
