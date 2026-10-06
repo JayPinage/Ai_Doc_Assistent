@@ -139,7 +139,9 @@ def build_pipeline(uploaded_files, persist_directory):
     split = splitter.split_documents(all_docs)
 
     # embed data
-    embeddings = MistralAIEmbeddings(model="mistral-embed")
+    embeddings = HuggingFaceEmbeddings(
+    model_name="sentence-transformers/all-MiniLM-L6-v2"
+)
 
     # store data
     vector_store = Chroma.from_documents(
