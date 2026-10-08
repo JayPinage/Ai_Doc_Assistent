@@ -7,6 +7,8 @@ from pathlib import Path
 import streamlit as st
 
 from dotenv import load_dotenv
+from pptx import Presentation
+from langchain_core.documents import Document
 
 from langchain_groq import ChatGroq
 from langchain_huggingface import HuggingFaceEmbeddings
