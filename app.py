@@ -1329,7 +1329,7 @@ tab_summary, tab_chat, tab_eval = st.tabs(
     [
         "📋 Summary",
         "💬 Chat",
-        "📊 Evaluation",
+        
     ]
 )
 
@@ -1435,21 +1435,8 @@ with tab_chat:
 
                     col1, col2 = st.columns(2)
 
-                    with col1:
 
-                        st.metric(
-                            "Retrieved",
-                            metrics[
-                                "retrieved_chunks"
-                            ]
-                        )
 
-                    with col2:
-
-                        st.metric(
-                            "Latency",
-                            f'{metrics["total_latency"]}s'
-                        )
 
                 # -------------------------------------------
                 # SOURCES
