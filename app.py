@@ -20,7 +20,7 @@ from langchain_community.document_loaders import (
 )
 
 from langchain_community.retrievers import BM25Retriever
-from langchain_community.vectorstores import Chroma
+from langchain_chroma import Chroma 
 
 from langchain.retrievers import EnsembleRetriever
 
@@ -29,11 +29,7 @@ from langchain_text_splitters import (
 )
 
 from langchain_core.prompts import ChatPromptTemplate
-
-from langfuse import (
-    get_client,
-    propagate_attributes,
-)
+from langfuse import get_client   
 
 
 # ============================================================
