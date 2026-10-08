@@ -945,6 +945,41 @@ PAGE: {page_number}
                 answer = error
 
         # ----------------------------------------------------
+        # AUTOMATIC EVALUATION
+        # ----------------------------------------------------
+        # Evaluation runs internally after every successful RAG
+        # answer. Scores are sent to Langfuse and are not shown
+        # in the Streamlit UI.
+
+        evaluation_scores = {}
+
+        if valid:
+
+            try:
+
+                evaluation_scores = evaluate_answer(
+                    question=query,
+                    answer=answer,
+                    context=context,
+                )
+
+            except Exception as evaluation_error:
+
+                evaluation_scores = {
+                    "faithfulness": None,
+                    "relevance": None,
+                    "overall": None,
+                }
+
+                root.update(
+                    metadata={
+                        "evaluation_error": str(
+                            evaluation_error
+                        )
+                    }
+                )
+
+        # ----------------------------------------------------
         # SOURCES
         # ----------------------------------------------------
 
@@ -1011,6 +1046,18 @@ PAGE: {page_number}
             "total_latency": round(
                 total_time,
                 3
+            ),
+
+            # Internal evaluation scores. These are sent to
+            # Langfuse and are not rendered in the UI.
+            "faithfulness": evaluation_scores.get(
+                "faithfulness"
+            ),
+            "relevance": evaluation_scores.get(
+                "relevance"
+            ),
+            "overall_quality": evaluation_scores.get(
+                "overall"
             ),
         }
 
@@ -1207,7 +1254,7 @@ st.title(
 
 st.caption(
     "Hybrid Search • Reranking • Guardrails • "
-    "Evaluation • Langfuse Observability"
+    "Langfuse Observability"
 )
 
 
@@ -1297,10 +1344,6 @@ with st.sidebar:
     )
 
     st.write(
-        "📊 LLM Evaluation"
-    )
-
-    st.write(
         "🔭 Langfuse Observability"
     )
 
@@ -1325,11 +1368,10 @@ with st.sidebar:
 # TABS
 # ============================================================
 
-tab_summary, tab_chat, tab_eval = st.tabs(
+tab_summary, tab_chat = st.tabs(
     [
         "📋 Summary",
         "💬 Chat",
-        
     ]
 )
 
@@ -1475,144 +1517,6 @@ with tab_chat:
                     ],
                 }
             )
-
-
-# ============================================================
-# EVALUATION TAB
-# ============================================================
-
-with tab_eval:
-
-    st.header(
-        "📊 RAG Evaluation"
-    )
-
-    st.caption(
-        "Evaluate the generated answer for "
-        "faithfulness and relevance."
-    )
-
-    if not st.session_state.last_answer:
-
-        st.info(
-            "Ask a question in the Chat tab first."
-        )
-
-    else:
-
-        st.subheader(
-            "Last Answer"
-        )
-
-        st.write(
-            st.session_state.last_answer
-        )
-
-        eval_question = st.text_input(
-            "Question used for evaluation",
-            value=(
-                st.session_state.messages[-2][
-                    "content"
-                ]
-                if len(
-                    st.session_state.messages
-                ) >= 2
-                and st.session_state.messages[-2][
-                    "role"
-                ] == "user"
-                else ""
-            )
-        )
-
-        expected_answer = st.text_area(
-            "Optional expected answer",
-            placeholder=(
-                "Enter the ground-truth answer "
-                "for correctness evaluation..."
-            )
-        )
-
-        evaluate_btn = st.button(
-            "🧪 Evaluate Answer",
-            type="primary"
-        )
-
-        if evaluate_btn:
-
-            if not eval_question:
-
-                st.warning(
-                    "Enter the question."
-                )
-
-            else:
-
-                # Retrieve again for evaluation context
-                docs = (
-                    st.session_state.retriever
-                    .invoke(eval_question)
-                )
-
-                docs = rerank_documents(
-                    eval_question,
-                    docs,
-                    top_k=5,
-                )
-
-                context = "\n\n".join(
-                    doc.page_content
-                    for doc in docs
-                )
-
-                with st.spinner(
-                    "Running evaluation..."
-                ):
-
-                    scores = evaluate_answer(
-                        question=eval_question,
-                        answer=(
-                            st.session_state
-                            .last_answer
-                        ),
-                        context=context,
-                    )
-
-                st.success(
-                    "Evaluation completed."
-                )
-
-                col1, col2, col3 = st.columns(3)
-
-                with col1:
-
-                    st.metric(
-                        "Faithfulness",
-                        f"{scores['faithfulness']:.2f}"
-                    )
-
-                with col2:
-
-                    st.metric(
-                        "Relevance",
-                        f"{scores['relevance']:.2f}"
-                    )
-
-                with col3:
-
-                    st.metric(
-                        "Overall",
-                        f"{scores['overall']:.2f}"
-                    )
-
-                # Optional expected answer
-                if expected_answer:
-
-                    st.info(
-                        "Ground-truth answer was "
-                        "provided. You can extend this "
-                        "panel with a separate correctness "
-                        "judge for benchmark evaluation."
-                    )
 
 
 # ============================================================
