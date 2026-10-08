@@ -9,10 +9,8 @@ import streamlit as st
 from dotenv import load_dotenv
 
 from langchain_groq import ChatGroq
-from langchain_huggingface import (
-    HuggingFaceEmbeddings,
-    HuggingFaceCrossEncoder,
-)
+from langchain_huggingface import HuggingFaceEmbeddings
+from langchain_community.cross_encoders import HuggingFaceCrossEncoder
 
 from langchain_community.document_loaders import (
     PyPDFLoader,
