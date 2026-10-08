@@ -262,8 +262,8 @@ def load_file(file_path: str):
             encoding="utf-8"
         )
 
-   elif ext == ".pptx":
-    return load_pptx(file_path)
+    elif ext == ".pptx":
+        return load_pptx(file_path)
 
     else:
 
