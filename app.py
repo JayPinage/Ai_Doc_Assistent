@@ -228,7 +228,17 @@ Return ONLY a number:
 """
 )
 
-
+def load_pptx(path):
+    prs = Presentation(path)
+    docs = []
+    for i, slide in enumerate(prs.slides, 1):
+        text = "\n".join(
+            s.text_frame.text for s in slide.shapes
+            if s.has_text_frame and s.text_frame.text.strip()
+        )
+        if text:
+            docs.append(Document(page_content=text, metadata={"source": path, "page": i - 1}))
+    return docs
 # ============================================================
 # FILE LOADING
 # ============================================================
@@ -252,11 +262,8 @@ def load_file(file_path: str):
             encoding="utf-8"
         )
 
-    elif ext in (".pptx", ".ppt"):
-
-        loader = UnstructuredPowerPointLoader(
-            file_path
-        )
+   elif ext == ".pptx":
+    return load_pptx(file_path)
 
     else:
 
